@@ -108,6 +108,7 @@ export class Game {
         if (this.paused) {
             return;
         }
+
         this.obstacleManager.placeNewObstacle(this.gameWindow, previousGameWindow);
 
         this.skier.update(this.gameTime);
@@ -178,7 +179,8 @@ export class Game {
     }
 
     getScore(): number {
-        const score = this.skier.position.x + this.skier.position.y;
+        const {x, y} = this.skier.getPosition()
+        const score = x + y;
         return Math.floor(score);
     }
 
