@@ -100,7 +100,7 @@ how creative candidates get with this.
 
 We are looking forward to see what you come up with!!
 
-## Documentation/submission notes (Eamonn Hayden)
+## Documentation/submission notes
 
 ### Notes
 
