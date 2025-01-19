@@ -124,6 +124,8 @@ export class Game {
         this.skier.draw();
         this.rhino.draw();
         this.obstacleManager.drawObstacles();
+
+        this.drawScore();
     }
 
     /**
@@ -171,5 +173,17 @@ export class Game {
         if (handled) {
             event.preventDefault();
         }
+    }
+
+    getScore(): number {
+        return this.skier.position.x + this.skier.position.y;
+    }
+
+    drawScore() {
+        const canvasContext = this.canvas.ctx;
+
+        canvasContext.font = "18px Consolas";
+        canvasContext.fillStyle = "black";
+        canvasContext.fillText(`Score: ${this.getScore()}`, 9, 18);
     }
 }
