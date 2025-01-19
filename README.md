@@ -116,6 +116,13 @@ We are looking forward to see what you come up with!!
   - Introduced a `collide(skier)` behaviour method for obstacles, providing flexibility for obstacle interactions on a per-obstacle basis.
 - Centralised core animation logic into the Entity class, which enables easy introduction of animation for all game objects.
 
+#### Bonus items
+
+- Added the ability to reset the game once the player is dead (R key).
+- Added the ability to pause the game (P key). Other inputs are disabled when the game is paused.
+
 #### Misc
 
 - Fixed a pre-existing issue where scrollbars appeared and overlapped the play area.
+
+#### Known issues
