@@ -8,6 +8,7 @@ import { Canvas } from "../../Core/Canvas";
 import { ImageManager } from "../../Core/ImageManager";
 import { Position, randomInt, Rect } from "../../Core/Utils";
 import { Obstacle } from "./Obstacle";
+import { OBSTACLE_VARIANTS } from './ObstacleVariants/';
 
 /**
  * Ensures that obstacles aren't too close together
@@ -152,9 +153,17 @@ export class ObstacleManager {
             position = this.calculateOpenPosition(placementArea);
         } while (!position);
 
-        const newObstacle = new Obstacle(position.x, position.y, this.imageManager, this.canvas);
+        const newObstacle = this.createRandomObstacle(position.x, position.y);
 
         this.obstacles.push(newObstacle);
+    }
+
+    /**
+     * Generate a new random obstacle
+     */
+    createRandomObstacle(x: number, y: number): Obstacle {
+        const ObstacleVariant = OBSTACLE_VARIANTS[randomInt(0, OBSTACLE_VARIANTS.length - 1)];
+        return new ObstacleVariant(x, y, this.imageManager, this.canvas);
     }
 
     /**

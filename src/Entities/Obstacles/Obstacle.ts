@@ -3,10 +3,8 @@
  */
 
 import { IMAGE_NAMES } from "../../Constants";
-import { Canvas } from "../../Core/Canvas";
-import { ImageManager } from "../../Core/ImageManager";
-import { randomInt } from "../../Core/Utils";
 import { Entity } from "../Entity";
+import {Skier} from '../Skier';
 
 /**
  * The different types of obstacles that can be placed in the game.
@@ -18,21 +16,12 @@ const OBSTACLE_TYPES: IMAGE_NAMES[] = [
     IMAGE_NAMES.ROCK2,
 ];
 
-export class Obstacle extends Entity {
+export abstract class Obstacle extends Entity {
     /**
      * The name of the current image being displayed for the obstacle.
      */
-    imageName: IMAGE_NAMES;
-
-    /**
-     * Initialize an obstacle and make it a random type.
-     */
-    constructor(x: number, y: number, imageManager: ImageManager, canvas: Canvas) {
-        super(x, y, imageManager, canvas);
-
-        const typeIdx = randomInt(0, OBSTACLE_TYPES.length - 1);
-        this.imageName = OBSTACLE_TYPES[typeIdx];
-    }
+    abstract imageName: IMAGE_NAMES;
+    abstract collide(skier: Skier): void;
 
     /**
      * Obstacles can't be destroyed

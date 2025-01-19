@@ -5,6 +5,7 @@
 
 import { IMAGE_NAMES, DIAGONAL_SPEED_REDUCER, KEYS } from "../Constants";
 import { Entity } from "./Entity";
+import { Animation } from "../Core/Animation";
 import { Canvas } from "../Core/Canvas";
 import { ImageManager } from "../Core/ImageManager";
 import { intersectTwoRects, Rect } from "../Core/Utils";
@@ -24,6 +25,7 @@ enum STATES {
     STATE_SKIING = "skiing",
     STATE_CRASHED = "crashed",
     STATE_DEAD = "dead",
+    STATE_JUMPING = "jumping",
 }
 
 /**
@@ -45,6 +47,17 @@ const DIRECTION_IMAGES: { [key: number]: IMAGE_NAMES } = {
     [DIRECTION_RIGHT_DOWN]: IMAGE_NAMES.SKIER_RIGHTDOWN,
     [DIRECTION_RIGHT]: IMAGE_NAMES.SKIER_RIGHT,
 };
+
+/**
+ * Sequences of images that comprise the animations for the different states of the rhino.
+ */
+const IMAGES_JUMPING: IMAGE_NAMES[] = [
+    IMAGE_NAMES.SKIER_JUMP_1,
+    IMAGE_NAMES.SKIER_JUMP_2,
+    IMAGE_NAMES.SKIER_JUMP_3,
+    IMAGE_NAMES.SKIER_JUMP_4,
+    IMAGE_NAMES.SKIER_JUMP_5,
+];
 
 export class Skier extends Entity {
     /**
@@ -79,6 +92,15 @@ export class Skier extends Entity {
         super(x, y, imageManager, canvas);
 
         this.obstacleManager = obstacleManager;
+
+        this.setupAnimations();
+    }
+
+    /**
+     * Create and store the animations.
+     */
+    setupAnimations() {
+        this.animations[STATES.STATE_JUMPING] = new Animation(IMAGES_JUMPING, false, this.landJump.bind(this));
     }
 
     /**
@@ -103,6 +125,13 @@ export class Skier extends Entity {
     }
 
     /**
+     * Is the skier currently in the jumping state
+     */
+    isJumping(): boolean {
+        return this.state === STATES.STATE_JUMPING;
+    }
+
+    /**
      * Set the current direction the skier is facing and update the image accordingly
      */
     setDirection(direction: number) {
@@ -120,11 +149,13 @@ export class Skier extends Entity {
     /**
      * Move the skier and check to see if they've hit an obstacle. The skier only moves in the skiing state.
      */
-    update() {
-        if (this.isSkiing()) {
+    update(gameTime: number) {
+        if (this.isSkiing() || this.isJumping()) {
             this.move();
             this.checkIfHitObstacle();
         }
+
+        this.animate(gameTime);
     }
 
     /**
@@ -218,18 +249,29 @@ export class Skier extends Entity {
 
         let handled: boolean = true;
 
+        if (this.isJumping()) {
+            return handled;
+        }
+
         switch (inputKey) {
             case KEYS.LEFT:
+            case KEYS.A:
                 this.turnLeft();
                 break;
             case KEYS.RIGHT:
+            case KEYS.D:
                 this.turnRight();
                 break;
             case KEYS.UP:
+            case KEYS.W:
                 this.turnUp();
                 break;
             case KEYS.DOWN:
+            case KEYS.S:
                 this.turnDown();
+                break;
+            case KEYS.SPACEBAR:
+                this.jump();
                 break;
             default:
                 handled = false;
@@ -316,15 +358,17 @@ export class Skier extends Entity {
     }
 
     /**
-     * Go through all the obstacles in the game and see if the skier collides with any of them. If so, crash the skier.
+     * Get a list of obstacles that the skier is currently colliding with
      */
-    checkIfHitObstacle() {
+    getCollidingObstacles(): Obstacle[] {
         const skierBounds = this.getBounds();
         if (!skierBounds) {
-            return;
+            return [];
         }
 
-        const collision = this.obstacleManager.getObstacles().find((obstacle: Obstacle): boolean => {
+        const obstacles: Obstacle[] = this.obstacleManager.getObstacles();
+
+        const collidingObstacles = obstacles.filter((obstacle: Obstacle): boolean => {
             const obstacleBounds = obstacle.getBounds();
             if (!obstacleBounds) {
                 return false;
@@ -333,9 +377,16 @@ export class Skier extends Entity {
             return intersectTwoRects(skierBounds, obstacleBounds);
         });
 
-        if (collision) {
-            this.crash();
-        }
+        return collidingObstacles;
+    }
+
+    /**
+     * Go through all the obstacles in the game and see if the skier collides with any of them. If so, crash the skier.
+     */
+    checkIfHitObstacle() {
+        const collidingObstacles = this.getCollidingObstacles();
+
+        collidingObstacles.forEach((obstacle: Obstacle) => obstacle.collide(this))
     }
 
     /**
@@ -343,9 +394,19 @@ export class Skier extends Entity {
      * image.
      */
     crash() {
-        this.state = STATES.STATE_CRASHED;
+        this.setState(STATES.STATE_CRASHED);
         this.speed = 0;
         this.imageName = IMAGE_NAMES.SKIER_CRASH;
+    }
+
+    jump() {
+        this.setState(STATES.STATE_JUMPING);
+        console.log('boing');
+    }
+
+    landJump() {
+        this.setState(STATES.STATE_SKIING);
+        this.setDirectionalImage();
     }
 
     /**
@@ -353,7 +414,7 @@ export class Skier extends Entity {
      * whichever direction they're recovering to.
      */
     recoverFromCrash(newDirection: number) {
-        this.state = STATES.STATE_SKIING;
+        this.setState(STATES.STATE_SKIING);
         this.speed = STARTING_SPEED;
         this.setDirection(newDirection);
     }
@@ -362,7 +423,7 @@ export class Skier extends Entity {
      * Kill the skier by putting them into the "dead" state and stopping their movement.
      */
     die() {
-        this.state = STATES.STATE_DEAD;
+        this.setState(STATES.STATE_DEAD);
         this.speed = 0;
     }
 }

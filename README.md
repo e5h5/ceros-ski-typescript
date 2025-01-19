@@ -102,14 +102,20 @@ We are looking forward to see what you come up with!!
 
 ## Documentation/submission notes (Eamonn Hayden)
 
-### Known pre-existing bugs
+### Notes
 
-- Scrollbars appear, overlaying part of the play area. (RESOLVED)
+#### Jump Ramp Feature
 
-### Known introduced bugs
+- Added a new JumpRamp obstacle to the game world, which is randomly placed as the skier progresses.
+- Implemented the skier’s jumping behaviour, which can be triggered either by colliding with a jump ramp or pressing the spacebar.
+  - While jumping, the skier performs a complete flip animation cycle, utilising the provided jump sprite assets.
+  - During a jump, the skier can pass over specific obstacles thanks to flexible collide behaviour mentioned below.
+  - During a jump, the skier cannot change direction as they'd logically have no such control whilst in the air.
+- Refactored obstacles to inherit from a newly abstracted Obstacle base class, allowing shared but flexible behaviours without resorting to a cluttered monolith of an Obstacle class.
+  - Moved random selection of obstacle type to ObstacleManager, and using references to classes of ObstacleVariants instead of `IMAGE_NAMES`.
+  - Introduced a `collide(skier)` behaviour method for obstacles, providing flexibility for obstacle interactions on a per-obstacle basis.
+- Centralised core animation logic into the Entity class, which enables easy introduction of animation for all game objects.
 
-### Changelog[^1]
+#### Misc
 
-- fix: :bug: use client width and height to avoid unwanted scrollbars
-
- [^1]: (Alternatively, see git history if available)
+- Fixed a pre-existing issue where scrollbars appeared and overlapped the play area.
