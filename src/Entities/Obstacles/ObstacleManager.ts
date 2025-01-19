@@ -73,6 +73,8 @@ export class ObstacleManager {
      * skier.
      */
     placeInitialObstacles() {
+        this.obstacles = [];
+
         const numberObstacles = Math.ceil(
             (GAME_WIDTH / STARTING_OBSTACLE_REDUCER) * (GAME_HEIGHT / STARTING_OBSTACLE_REDUCER)
         );

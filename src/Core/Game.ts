@@ -56,6 +56,10 @@ export class Game {
         this.imageManager = new ImageManager();
         this.obstacleManager = new ObstacleManager(this.imageManager, this.canvas);
 
+        this.initialiseGame()
+    }
+
+    initialiseGame() {
         this.skier = new Skier(0, 0, this.imageManager, this.obstacleManager, this.canvas);
         this.rhino = new Rhino(-500, -2000, this.imageManager, this.canvas);
 
@@ -133,6 +137,13 @@ export class Game {
      * Handle keypresses and delegate to any game objects that might have key handling of their own.
      */
     handleKeyDown(event: KeyboardEvent) {
+        if (this.skier.isDead()) {
+            if (event.key === "r") {
+                this.initialiseGame();
+                event.preventDefault()
+            }
+            return;
+        }
         let handled: boolean = this.skier.handleInput(event.key);
 
         if (handled) {

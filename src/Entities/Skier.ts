@@ -401,7 +401,6 @@ export class Skier extends Entity {
 
     jump() {
         this.setState(STATES.STATE_JUMPING);
-        console.log('boing');
     }
 
     landJump() {
