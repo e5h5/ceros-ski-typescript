@@ -3,7 +3,7 @@
  * obstacles, places new obstacles as the skier moves throughout the world and displays them all to the screen.
  */
 
-import { GAME_WIDTH, GAME_HEIGHT } from "../../Constants";
+import { GAME_WIDTH, GAME_HEIGHT, NEW_OBSTACLE_CHANCE } from "../../Constants";
 import { Canvas } from "../../Core/Canvas";
 import { ImageManager } from "../../Core/ImageManager";
 import { Position, randomInt, Rect } from "../../Core/Utils";
@@ -26,11 +26,6 @@ const STARTING_OBSTACLE_GAP: number = 100;
  */
 const STARTING_OBSTACLE_REDUCER: number = 300;
 
-/**
- * The chance that a new obstacle will be placed as the skier is moving. A lower number increases the chances.
- */
-const NEW_OBSTACLE_CHANCE: number = 8;
-
 export class ObstacleManager {
     /**
      * All obstacles that exist in the game
@@ -41,6 +36,8 @@ export class ObstacleManager {
      * Stored reference to the ImageManager
      */
     imageManager: ImageManager;
+
+    newObstacleChance: number = NEW_OBSTACLE_CHANCE;
 
     /**
      * Stored reference to the Canvas obstacles are drawn to
@@ -90,13 +87,17 @@ export class ObstacleManager {
         });
     }
 
+    setNewObstacleChance(chance: number) {
+        this.newObstacleChance = chance;
+    }
+
     /**
      * Place a new obstacle while the game is running. If the game window has moved, we want to figure out which direction(s)
      * it has moved in and try to place a new obstacle offscreen (so player doesn't see it pop in) in that direction(s).
      */
     placeNewObstacle(gameWindow: Rect, previousGameWindow: Rect) {
-        const shouldPlaceObstacle = randomInt(1, NEW_OBSTACLE_CHANCE);
-        if (shouldPlaceObstacle !== NEW_OBSTACLE_CHANCE) {
+        const shouldPlaceObstacle = randomInt(1, this.newObstacleChance);
+        if (shouldPlaceObstacle !== this.newObstacleChance) {
             return;
         }
 

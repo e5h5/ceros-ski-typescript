@@ -76,3 +76,7 @@ export const IMAGES: iImage[] = [
 
 export const ANIMATION_FRAME_SPEED_MS: number = 250;
 export const DIAGONAL_SPEED_REDUCER: number = 1.4142;
+
+export const STARTING_SPEED: number = 10;
+
+export const NEW_OBSTACLE_CHANCE: number = 8;

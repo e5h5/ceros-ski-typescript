@@ -2,7 +2,7 @@
  * The main game class. This initializes the game as well as runs the game/render loop and initial handling of input.
  */
 
-import { GAME_CANVAS, GAME_WIDTH, GAME_HEIGHT, IMAGES, KEYS } from "../Constants";
+import { GAME_CANVAS, GAME_WIDTH, GAME_HEIGHT, IMAGES, KEYS, STARTING_SPEED, NEW_OBSTACLE_CHANCE } from "../Constants";
 import { Canvas } from "./Canvas";
 import { ImageManager } from "./ImageManager";
 import { Position, Rect } from "./Utils";
@@ -112,6 +112,8 @@ export class Game {
 
         this.skier.update(this.gameTime);
         this.rhino.update(this.gameTime, this.skier);
+
+        this.updateDifficulty();
     }
 
     /**
@@ -176,7 +178,8 @@ export class Game {
     }
 
     getScore(): number {
-        return this.skier.position.x + this.skier.position.y;
+        const score = this.skier.position.x + this.skier.position.y;
+        return Math.floor(score);
     }
 
     drawScore() {
@@ -185,5 +188,13 @@ export class Game {
         canvasContext.font = "18px Consolas";
         canvasContext.fillStyle = "black";
         canvasContext.fillText(`Score: ${this.getScore()}`, 9, 18);
+    }
+
+    updateDifficulty() {
+        const newSpeed = Math.floor(Math.max(STARTING_SPEED, STARTING_SPEED + Math.log(this.getScore() / 1000) * 4));
+        this.skier.setBaseSpeed(newSpeed);
+
+        const newObstacleChance = Math.floor(Math.min(NEW_OBSTACLE_CHANCE, NEW_OBSTACLE_CHANCE - Math.log(this.getScore() / 1000) * 2));
+        this.obstacleManager.setNewObstacleChance(newObstacleChance);
     }
 }

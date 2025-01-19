@@ -3,7 +3,7 @@
  * angles, and crashes into obstacles they run into. If caught by the rhino, the skier will get eaten and die.
  */
 
-import { IMAGE_NAMES, DIAGONAL_SPEED_REDUCER, KEYS } from "../Constants";
+import { IMAGE_NAMES, DIAGONAL_SPEED_REDUCER, KEYS, STARTING_SPEED } from "../Constants";
 import { Entity } from "./Entity";
 import { Animation } from "../Core/Animation";
 import { Canvas } from "../Core/Canvas";
@@ -11,11 +11,6 @@ import { ImageManager } from "../Core/ImageManager";
 import { intersectTwoRects, Rect } from "../Core/Utils";
 import { ObstacleManager } from "./Obstacles/ObstacleManager";
 import { Obstacle } from "./Obstacles/Obstacle";
-
-/**
- * The skier starts running at this speed. Saved in case speed needs to be reset at any point.
- */
-const STARTING_SPEED: number = 10;
 
 /**
  * The different states the skier can be in.
@@ -79,6 +74,8 @@ export class Skier extends Entity {
      * How fast the skier is currently moving in the game world.
      */
     speed: number = STARTING_SPEED;
+
+    baseSpeed: number = STARTING_SPEED;
 
     /**
      * Stored reference to the ObstacleManager
@@ -408,13 +405,21 @@ export class Skier extends Entity {
         this.setDirectionalImage();
     }
 
+    setBaseSpeed(speed: number) {
+        this.baseSpeed = speed;
+
+        if (this.speed > 0) {
+            this.speed = speed;
+        }
+    }
+
     /**
      * Change the skier back to the skiing state, get them moving again at the starting speed and set them facing
      * whichever direction they're recovering to.
      */
     recoverFromCrash(newDirection: number) {
         this.setState(STATES.STATE_SKIING);
-        this.speed = STARTING_SPEED;
+        this.speed = this.baseSpeed;
         this.setDirection(newDirection);
     }
 

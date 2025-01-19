@@ -121,6 +121,7 @@ We are looking forward to see what you come up with!!
 - Added the ability to reset the game once the player is dead (R key).
 - Added the ability to pause the game (P key). Other inputs are disabled when the game is paused.
 - Added simple score based on player's distance from origin point.
+- Added ramping difficulty that initially increases reasonably quickly, then reduces its acceleration over time, allowing for a more playable 'endgame' level of difficulty.
 
 #### Misc
 
