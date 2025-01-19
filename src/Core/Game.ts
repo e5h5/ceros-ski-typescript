@@ -2,7 +2,7 @@
  * The main game class. This initializes the game as well as runs the game/render loop and initial handling of input.
  */
 
-import { GAME_CANVAS, GAME_WIDTH, GAME_HEIGHT, IMAGES } from "../Constants";
+import { GAME_CANVAS, GAME_WIDTH, GAME_HEIGHT, IMAGES, KEYS } from "../Constants";
 import { Canvas } from "./Canvas";
 import { ImageManager } from "./ImageManager";
 import { Position, Rect } from "./Utils";
@@ -25,6 +25,8 @@ export class Game {
      * Current game time
      */
     private gameTime: number = Date.now();
+
+    private paused: boolean = false;
 
     private imageManager!: ImageManager;
 
@@ -103,6 +105,9 @@ export class Game {
         const previousGameWindow: Rect = this.gameWindow;
         this.calculateGameWindow();
 
+        if (this.paused) {
+            return;
+        }
         this.obstacleManager.placeNewObstacle(this.gameWindow, previousGameWindow);
 
         this.skier.update(this.gameTime);
@@ -133,18 +138,35 @@ export class Game {
         this.gameWindow = new Rect(left, top, left + GAME_WIDTH, top + GAME_HEIGHT);
     }
 
+    togglePause() {
+        this.paused = !this.paused;
+    }
+
+
+    handleInput(inputKey: string) {
+        switch (inputKey) {
+            case KEYS.R:
+                if (this.skier.isDead()) {
+                    this.initialiseGame();
+                    return true;
+                }
+            case KEYS.P:
+                this.togglePause();
+                return true;
+            default:
+                return this.paused;
+        }
+    }
+
     /**
      * Handle keypresses and delegate to any game objects that might have key handling of their own.
      */
     handleKeyDown(event: KeyboardEvent) {
-        if (this.skier.isDead()) {
-            if (event.key === "r") {
-                this.initialiseGame();
-                event.preventDefault()
-            }
-            return;
+        let handled: boolean = this.handleInput(event.key);
+
+        if (!handled) {
+            handled = this.skier.handleInput(event.key);
         }
-        let handled: boolean = this.skier.handleInput(event.key);
 
         if (handled) {
             event.preventDefault();

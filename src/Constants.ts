@@ -14,6 +14,8 @@ export enum KEYS {
     A = "a",
     S = "s",
     D = "d",
+    R = "r",
+    P = "p",
 }
 
 export enum IMAGE_NAMES {
